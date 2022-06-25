@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>openhab-geojson</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div id="nav">
+  </div>
+
+  <div id="content">
+    <svg class="canvas">
+      <g class="map"></g>
+    </svg>
+  </div>
+
+  <script src="http://d3js.org/d3.v6.min.js"></script>
+  <script src="common.v6.js"></script>
+  <script src="oh/control/OhControl.js"></script>
+  <script src="oh/boundary/OhView.js"></script>
+
+  <script>
+
+/**
+
+  d3 js setup
+
+  https://www.d3indepth.com/geographic/
+
+**/
+
+// TODO Mercator could be problematic further up north
+let projection = d3.geoMercator()
+
+let geoGenerator = d3.geoPath()
+  .pointRadius(40)
+  .projection(projection)
+
+function update(geojson) {
+
+  rect = d3.select(".canvas").node().getBoundingClientRect()
+  projection.fitExtent([[40,40],[rect.width-40,rect.height-40]], geojson);
+
+  let u = d3.select('#content g.map')
+    .selectAll('path')
+    .data(geojson.features)
+
+  u.enter()
+    .append('path')
+    .attr('d', geoGenerator)
+    .attr('data-location', function(d) {return d.properties.location;})
+    .attr('data-item', function(d) {return d.properties.item;})
+    .attr('data-Light', function(d) {return d.properties.Light;})
+    .attr('data-DimmableLight', function(d) {return d.properties.DimmableLight;})
+    .attr('data-Temperature', function(d) {return d.properties.Temperature;})
+    .attr('data-Thermostat', function(d) {return d.properties.Thermostat;})
+    .attr('data-Group', function(d) {return d.properties.group})
+    .attr('data-type', function(d) {return d.geometry.type})
+    .on("click", handleClick)
+}
+
+
+/**
+
+  ENTRY POINT
+
+**/
+
+var queryString = location.search;
+let params = new URLSearchParams(queryString);
+
+let rootgroup = "Home"
+
+let group = params.get("group");
+group = (group==null)?rootgroup:group;
+
+configurl = "/rest/items/"+rootgroup+"?metadata=geojson&recursive=false"
+ohurl = "/rest/items/"+group+"?metadata=geojson&recursive=true"
+
+var enableExport = params.get("export");
+
+d3.json(configurl).then( function(conf) {
+  let navgroups = conf.metadata?.geojson?.config?.nav
+  if (navgroups) {
+    d3.select('#nav')
+      .selectAll("a")
+      .data(navgroups)
+      .enter()
+          .append("a")
+             .attr("class", "btn")
+             .attr("href", function(d) { return "?group="+d} )
+             .text(function(d) {return d})
+  }
+  let rot = conf.metadata?.geojson?.config?.rotation
+  if (rot) {
+    projection.rotate(rot)
+  }
+})
+
+d3.json(ohurl).then( function(d) {
+  geoJson = features2Geojson(d, [0,0])
+  update(geoJson)
+  updateOHItems()
+})
+
+  </script>
+</body>
+</html>

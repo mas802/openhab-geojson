@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>openhab-geojson importer</title>
+  <style>
+  </style>
+</head>
+<body>
+
+  <div id="content">
+    <textarea id="geojson" rows="24" cols="80">
+    </textarea><br>
+    <input id='username' type='text' value=''/><br>
+    <input id='password' type='password' value=''/><br>
+    <input id='space' type='text' value='geojson'/><br>
+    <button onclick="doit(true)">dry run</button>
+    <button onclick="doit(false)">import</button>
+  </div>
+
+  <script src="http://d3js.org/d3.v6.min.js"></script>
+  <script src="oh/control/OhControl.js"></script>
+
+  <script>
+
+function doit(dryrun) {
+  input = JSON.parse(document.getElementById("geojson").value)
+  username = document.getElementById("username").value
+  password = document.getElementById("password").value
+  space = document.getElementById("space").value
+
+  valmap = new Map()
+
+  input.features?.forEach(function (f) {
+    console.log(f)
+
+    val = valmap.get(f.properties.item)
+    if (!val) {
+      val = JSON.parse('{ "value": "importer", "config": { "importinfo": "'+ new Date().toISOString() +'" } }')
+    }
+
+    if (f.geometry.type == 'Point') {
+        val.config.point = f.geometry
+    } else {
+        val.config.geometry = f.geometry
+    }
+    if (f.properties.offset) {
+        val.config.offset = f.properties.offset
+    }
+
+    valmap.set(f.properties.item, val)
+ 
+  })
+
+  console.log(valmap)
+
+  valmap.forEach((val, key) => {
+    if (!dryrun) {
+      ret = ohItemEditMetadata(username, password, key, space, JSON.stringify(val))
+      console.log(ret)
+    }
+    console.log([key,val])
+  })
+
+}
+
+
+var queryString = location.search;
+let params = new URLSearchParams(queryString);
+
+let group = params.get("group");
+group = (group==null)?"Home":group;
+ohurl = "/rest/items/"+group+"?metadata=geojson&recursive=true"
+
+d3.json(ohurl).then( function(d) {
+  geoJson = features2Geojson(d)
+  console.log(JSON.stringify(geoJson, null, 2))
+  document.getElementById("geojson").value = JSON.stringify(geoJson, null, 2)
+});
+
+  </script>
+</body>
+</html>

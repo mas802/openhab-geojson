@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>openhab-geojson dimmer</title>
+  <style>
+    body {
+      touch-action: none;
+    }
+    #mycanvas {
+       margin: auto;
+       display: flex;   
+       justify-content: center; 
+    }
+  </style>
+</head>
+<body id='body'>
+
+  <div id="mycanvas" class="map-container"><svg></svg></div>
+
+  <script src="http://d3js.org/d3.v4.min.js"></script>
+  <script src="common.v6.js"></script>
+  <script src="oh/control/OhControl.js"></script>
+
+  <script>
+
+// this is WIP, clearly needs a lot of clean up
+
+const setcenter = async (label) => {
+    a = document.querySelector("#"+label+"center");
+    console.log(['setcenter',a]);
+
+    result = await ohItemInfo(label);
+
+    a.setAttribute('data-value', result);
+    cls = result;
+
+    try {
+      value = +result.match(/([\d\.]+)/)[0];
+    } catch(e) {
+      value = -99;
+    }
+
+    if (value != -99) {
+      if (value > 0) { cls = "ON";}
+      a.setAttribute('style', 'fill: '+colorScaleLight(value));
+    } else {
+      a.setAttribute('style', '');
+    }
+
+    a.setAttribute('class', cls);
+}
+
+    var queryString = location.search;
+    let params = new URLSearchParams(queryString);
+
+    let item = params.get("item");
+
+// set the dimensions and margins of the graph
+var width = 750
+var height = 750
+var margin = 40
+var innerradius = 120
+var radius = 240
+
+// Create dummy data
+// var data = d3.scale.linear().domain([18, 19, 21,21.5, 28])
+var itemsmap = [item]
+var data = {0:1, 10:1, 20:1, 40:1, 50:1, 60:1, 70:1, 80:1, 90:1, 100:1}
+
+
+// append the svg object to the div called 'my_dataviz'
+var svgcanvas = d3.select("#mycanvas")
+  .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+// Compute the position of each group on the pie:
+var pie = d3.pie()
+  .value(function(d) {return d.value; })
+var data_ready = pie(d3.entries(data))
+
+
+// Build the pie chart: Basically, each part of the pie is a path that we build using the arc function.
+var items = svgcanvas.selectAll(".mpie")
+  .data(itemsmap)
+  .enter().append("g")
+  .attr("data-item", function(d){ return d})
+  .attr("class", "items")
+
+var center = items.selectAll(".center")
+  .data(itemsmap)
+  .enter().append("g")
+  .attr("class", "center")
+  .on("click", function(d) {
+    if ('referrer' in document) {
+      window.location = document.referrer;
+    }
+  })
+  .append('path')
+  .attr('d', d3.arc()
+    .innerRadius(0)
+    .outerRadius(innerradius)
+    .startAngle(0)
+    .endAngle(2*Math.PI)
+  )
+  .attr("data-item", function(d){ return d})
+  .attr("id", function(d){ return d+"center"})
+  .attr('fill', function(d) { 
+     color = colorScaleLight(0) 
+     return color })
+  .on("pointerdown", function(d) { 
+    expanse(d) } )
+  .on("pointerup", function(d) { 
+    console.log(["center",d3.event]) } )
+
+expanseOnMe(item, svgcanvas.selectAll(".mpie").data(itemsmap).enter());
+
+setcenter(item);
+
+// https://www.d3-graph-gallery.com/graph/donut_basic.html
+
+
+// helper
+
+function expanse(dd) {
+  console.log(d3.event)
+  expanseOnMe(dd,d3.select(d3.event.srcElement.parentNode));
+}
+
+function expanseOnMe(dd,e) {
+  console.log(e);
+  g = e
+  .append('g')
+  .selectAll('xwhatever')
+  .data(data_ready)
+  .enter()
+  .append('path')
+  .attr('d', d3.arc()
+    .innerRadius(innerradius)         // This is the size of the donut hole
+    .outerRadius(radius)
+  )
+  .attr('fill', function(d){ return(colorScaleLight(d.data.key)) })
+  .attr("data-value", function(d){ return d.data.key })
+  .attr("stroke", "white")
+  .style("stroke-width", "2px")
+  .style("opacity", 1)
+  .on("pointerup", function(d) { 
+    let val = d.data.key
+    if (val===0) {
+      val = "OFF"
+    }
+    ohItemCommand(dd, val)
+    d3.select(this.parentNode.parentNode).selectAll("g").remove();
+    var color = colorScaleLight(d.data.key)
+    d3.select("#"+dd+"center")
+      .attr('fill', function(d){ return(color) })
+    if ('referrer' in document) {
+      window.location = document.referrer;
+    }
+  })
+}
+
+  </script>
+</body>
+</html>
