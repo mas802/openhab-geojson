@@ -124,7 +124,7 @@ const toggleLight = async (label) => {
     }
 
     window.setTimeout(function() {
-       updateOHItems();
+       updateOHItems(modes.split(','));
     }, 200);
 }
 
@@ -140,7 +140,7 @@ const toggleBlinds = async (label) => {
     }
 
     window.setTimeout(function() {
-       updateOHItems();
+       updateOHItems(modes.split(','));
     }, 200);
 }
 

@@ -1,21 +1,5 @@
-function updateOHItems() {
-/* */
-        var b = document.querySelectorAll('[data-Light]');
-        for (var i in b) if (b.hasOwnProperty(i)) {
-            itemLightState(b[i], 'data-Light');
-        }
-
-/* WIP
-        var b = document.querySelectorAll('[data-Temperature]');
-        for (var i in b) if (b.hasOwnProperty(i)) {
-            itemTempState(b[i], 'data-Temperature');
-        }
- */
-
-        var b = document.querySelectorAll('[data-DimmableLight]');
-        for (var i in b) if (b.hasOwnProperty(i)) {
-            itemLightState(b[i], 'data-DimmableLight');
-        }
+function updateOHItems(modes) {
+    modes.forEach(e => triggerUpdateState(e));
 }
 
 function handleClick(e, d) {
@@ -38,6 +22,24 @@ function handleClick(e, d) {
       break
   }
 }
+
+function triggerUpdateState(attr) {
+        var ele = document.querySelectorAll('[data-'+attr+']');
+        for (var i in ele) if (ele.hasOwnProperty(i)) {
+            itemUpdateState(ele[i], attr);
+        }
+}
+
+const itemUpdateState = async (ele, attr) => {
+  switch (attr) {
+    case "Temperature":
+      itemTempState(ele, 'data-Temperature');
+      break;
+    default:
+      itemLightState(ele, 'data-'+attr);
+  }
+}
+
 
 const itemLightState = async (a, attr) => {
     let response, result;

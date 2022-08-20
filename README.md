@@ -3,7 +3,7 @@
 # What is this?
 
 This is a proof-of-concept to enhance openhab items with geojson data to produce a convention-over-configuration style interactive floorplan. 
-Currently it mainly serves to visualize and control lights, but an extension towards temperature and thermostates is in planning
+Currently it mainly serves to visualize and control lights (and blinds), but an extension towards temperature and thermostates is in planning
 and other features such as open/closed doors are possible.
 
 It might be developed into a UI addon at some point if there is sufficient interest - upvote here: [https://github.com/mas802/openhab-geojson/issues/1].
@@ -14,7 +14,7 @@ It might be developed into a UI addon at some point if there is sufficient inter
 
 - Openhab 3.0
 - The Models view in openhab should be structured hieracical with a focus on Home / Floors / Rooms (the setup expects the root node to be called Home)
-- The actionable items should have at least either an appropriate Category and/or Tags to make them work ("Light", "DimmableLight", "Temperature", etc).
+- The actionable items should have at least either an appropriate Category and/or Tags to make them work ("Light", "DimmableLight", "Temperature", "Blinds", etc).
 - There is a limit for one action per area/point, but you can always provide sub-areas/points at the lower level 
 (e.g. each light in a room can have its own area and/or point).
 
@@ -103,9 +103,10 @@ On the root item in your Model that must be called "Home" you can set two global
 To set this select the root node and click "Add Metadata" then enter geojson as the custom namespace.
 
 - nav: an array of groups for the main navigation 
+- modes: an array of modes for the main navigation 
 - rotation: a rotation matrix
 
-Example: This will create a navigation with 3 nodes and rotate the floorplan by 10 degrees.
+Example: This will create a navigation with 3 nodes, 2 modes and rotate the floorplan by 10 degrees.
 ```
 value: " "
 config:
@@ -113,6 +114,9 @@ config:
     - Home
     - 4OG
     - 5OG
+  modes:
+    - Light,DimmableLight
+    - Temperature,SetPoint
   rotation:
     - 0
     - 0
@@ -123,8 +127,9 @@ config:
 
 - Light
 - DimmableLight
+- Blindes
 - WIP: Temperature
-- Planned: Thermostat
+- Planned: Thermostat / SetPoint
 
 # References and inspirations
 

@@ -73,9 +73,13 @@ var queryString = location.search;
 let params = new URLSearchParams(queryString);
 
 let rootgroup = "Home"
+let defaultmodes = "Light,DimmableLight"
 
 let group = params.get("group");
 group = (group==null)?rootgroup:group;
+
+let modes = params.get("modes");
+modes = (modes==null)?defaultmodes:modes;
 
 configurl = "/rest/items/"+rootgroup+"?metadata=geojson&recursive=false"
 ohurl = "/rest/items/"+group+"?metadata=geojson&recursive=true"
@@ -83,17 +87,29 @@ ohurl = "/rest/items/"+group+"?metadata=geojson&recursive=true"
 var enableExport = params.get("export");
 
 d3.json(configurl).then( function(conf) {
+  nav = d3.select('#nav')
+      .selectAll("a")
+
   let navgroups = conf.metadata?.geojson?.config?.nav
   if (navgroups) {
-    d3.select('#nav')
-      .selectAll("a")
-      .data(navgroups)
+    nav.data(navgroups)
       .enter()
           .append("a")
              .attr("class", "btn")
-             .attr("href", function(d) { return "?group="+d} )
+             .attr("href", function(d) { return "?group="+d+"&modes="+modes} )
              .text(function(d) {return d})
   }
+
+  let modgroups = conf.metadata?.geojson?.config?.modes
+  if (modgroups) {
+    nav.data(modgroups)
+      .enter()
+          .append("a")
+             .attr("class", "btn modes")
+             .attr("href", function(d) { return "?group="+group+"&modes="+d} )
+             .text(function(d) {return d.substring(0,1)})
+  }
+
   let rot = conf.metadata?.geojson?.config?.rotation
   if (rot) {
     projection.rotate(rot)
@@ -103,7 +119,7 @@ d3.json(configurl).then( function(conf) {
 d3.json(ohurl).then( function(d) {
   geoJson = features2Geojson(d, [0,0])
   update(geoJson)
-  updateOHItems()
+  updateOHItems(modes.split(','))
 })
 
   </script>
