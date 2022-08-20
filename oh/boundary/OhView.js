@@ -30,6 +30,9 @@ function handleClick(e, d) {
       // TODO poping up the dimmer on the main vie might also be nice
       window.location.href = 'dimmer.html?item=' + d.properties?.DimmableLight;
       break
+    case "Blinds":
+      toggleBlinds(d.properties?.Blinds)
+      break
     case "Group":
       window.location.href = 'index.html?group=' + d.properties?.Group;
       break

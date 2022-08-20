@@ -84,6 +84,7 @@ const flatPoints = function(item,offset,currentpoint) {
       geometry: {type: pnt.type, coordinates: coords},
       properties: {
         item: item.name,
+        action: item.category
       }
     }
 
@@ -98,6 +99,9 @@ const flatPoints = function(item,offset,currentpoint) {
     } else if (item.tags?.includes("Light")) {
       currentpoint.properties['Light'] = item.name
       currentpoint.properties['action'] = "Light"
+    } else if (item.category == "Blinds") {
+      currentpoint.properties['Blinds'] = item.name
+      currentpoint.properties['action'] = "Blinds"
     }
   }
 
@@ -117,6 +121,22 @@ const toggleLight = async (label) => {
       ohItemCommand(label, "ON");
     } else {
       ohItemCommand(label, "OFF");
+    }
+
+    window.setTimeout(function() {
+       updateOHItems();
+    }, 200);
+}
+
+const toggleBlinds = async (label) => {
+    let response, result;
+
+    result = await ohItemInfo(label);
+
+    if (result == "UP" || result == "100") {
+      ohItemCommand(label, "DOWN");
+    } else {
+      ohItemCommand(label, "UP");
     }
 
     window.setTimeout(function() {
