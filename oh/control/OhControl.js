@@ -93,17 +93,20 @@ const flatPoints = function(item,offset,currentpoint) {
 
   // FIXME this should be more generic
   if (currentpoint) {
+    if (item.category) {
+      currentpoint.properties[item.category] = item.name
+    }
+
     if (item.category == "DimmableLight") {
-      currentpoint.properties['DimmableLight'] = item.name
       currentpoint.properties['action'] = "DimmableLight"
     } else if (item.tags?.includes("Light")) {
       currentpoint.properties['Light'] = item.name
       currentpoint.properties['action'] = "Light"
     } else if (item.category == "Blinds") {
-      currentpoint.properties['Blinds'] = item.name
       currentpoint.properties['action'] = "Blinds"
     }
   }
+
 
   item.members?.forEach(function (i) {
     features = features.concat(flatPoints(i,offset,currentpoint));

@@ -35,6 +35,9 @@ const itemUpdateState = async (ele, attr) => {
     case "Temperature":
       itemTempState(ele, 'data-Temperature');
       break;
+    case "Battery":
+      itemBatteryState(ele, 'data-Battery');
+      break;
     default:
       itemLightState(ele, 'data-'+attr);
   }
@@ -89,6 +92,30 @@ const itemTempState = async (a, attr) => {
 
       if (value != -99) {
         a.setAttribute('style', 'fill: '+colorScaleTemp(value))
+      } else {
+        a.setAttribute('style', '')
+      }
+
+    }
+}
+
+const itemBatteryState = async (a, attr) => {
+    let response, result;
+
+    let label = a.getAttribute(attr);
+    if (label!=null) {
+      result = await ohItemInfo(label);
+
+      a.setAttribute('data-value', result);
+
+      try {
+        value = +result.match(/([\d\.]+)/)[0]
+      } catch(e) {
+        value = -99
+      }
+
+      if (value != -99) {
+        a.setAttribute('style', 'fill: '+colorScaleBattery(value))
       } else {
         a.setAttribute('style', '')
       }

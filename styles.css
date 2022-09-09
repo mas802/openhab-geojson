@@ -13,6 +13,9 @@ body {
   stroke: #000;
   stroke-width: 3.5px;
 }
+#content .map path[data-type="Point"]:not([data-value],[data-action]) {
+  display: none;
+}
 #content .map .ON {
   fill-opacity: .2;
 }
