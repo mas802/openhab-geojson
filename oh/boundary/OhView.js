@@ -14,6 +14,10 @@ function handleClick(e, d) {
       // TODO poping up the dimmer on the main vie might also be nice
       window.location.href = 'dimmer.html?item=' + d.properties?.DimmableLight;
       break
+    case "Heating":
+      // TODO poping up the dimmer on the main vie might also be nice
+      window.location.href = 'Heating.html?item=' + d.properties?.Heating;
+      break
     case "Blinds":
       toggleBlinds(d.properties?.Blinds)
       break
@@ -32,6 +36,9 @@ function triggerUpdateState(attr) {
 
 const itemUpdateState = async (ele, attr) => {
   switch (attr) {
+    case "Heating":
+      itemTempState(ele, 'data-Heating');
+      break;
     case "Temperature":
       itemTempState(ele, 'data-Temperature');
       break;
@@ -69,6 +76,7 @@ const itemLightState = async (a, attr) => {
         a.setAttribute('style', 'fill: '+colorScaleLight(0))
       } else {
         a.setAttribute('style', '')
+        cls = "ERROR"
       }
 
       a.setAttribute('class', cls);
@@ -94,6 +102,7 @@ const itemTempState = async (a, attr) => {
         a.setAttribute('style', 'fill: '+colorScaleTemp(value))
       } else {
         a.setAttribute('style', '')
+        a.setAttribute('class', 'ERROR');
       }
 
     }
@@ -118,6 +127,7 @@ const itemBatteryState = async (a, attr) => {
         a.setAttribute('style', 'fill: '+colorScaleBattery(value))
       } else {
         a.setAttribute('style', '')
+        a.setAttribute('class', 'ERROR');
       }
 
     }

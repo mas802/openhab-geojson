@@ -3,8 +3,6 @@
 # What is this?
 
 This is a proof-of-concept to enhance openhab items with geojson data to produce a convention-over-configuration style interactive floorplan. 
-Currently it mainly serves to visualize and control lights (and blinds), but an extension towards temperature and thermostates is in planning
-and other features such as open/closed doors are possible.
 
 It might be developed into a UI addon at some point if there is sufficient interest - upvote here: [https://github.com/mas802/openhab-geojson/issues/1].
 
@@ -14,7 +12,7 @@ It might be developed into a UI addon at some point if there is sufficient inter
 
 - Openhab 3.0
 - The Models view in openhab should be structured hieracical with a focus on Home / Floors / Rooms (the setup expects the root node to be called Home)
-- The actionable items should have at least either an appropriate Category and/or Tags to make them work ("Light", "DimmableLight", "Temperature", "Blinds", etc).
+- The actionable items should have at least either an appropriate Category and/or Tags to make them work ("Light", "DimmableLight", "Temperature", "Blinds", "Heating", etc).
 - There is a limit for one action per area/point, but you can always provide sub-areas/points at the lower level 
 (e.g. each light in a room can have its own area and/or point).
 
@@ -116,7 +114,7 @@ config:
     - 5OG
   modes:
     - Light,DimmableLight
-    - Temperature,SetPoint
+    - Temperature,Heating
   rotation:
     - 0
     - 0
@@ -127,9 +125,10 @@ config:
 
 - Light
 - DimmableLight
-- Blindes
-- WIP: Temperature
-- Planned: Thermostat / SetPoint
+- Blinds
+- Temperature
+- Battery
+- Heating
 
 # References and inspirations
 
@@ -141,7 +140,13 @@ config:
 
 ## Stretch Goals / Ideas
 
-- supported types und category/tags should be cleaned up
+- supported types und category/tags should be cleaned up, generalized, and extended
+  - Door: show open and cloesd doors
+  - Luminace: light sensors
+  - Motion: motions sensors 
+- the selection of actions and data for areas and points should be decoupled
+- show value as a hover label
+- mechanism to show outdated information (e.g. Battery Level might be very old)
 - multiple points per point (force layout?)
 - url parameter more generic
 - generic root node instead of Home (multiple root nodes?)

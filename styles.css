@@ -11,9 +11,12 @@ body {
   fill: #fefefe;
   fill-opacity: .2;
   stroke: #000;
+  stroke-width: 2px;
+}
+#content .map path[data-action] {
   stroke-width: 3.5px;
 }
-#content .map path[data-type="Point"]:not([data-value],[data-action]) {
+#content .map path[data-type="Point"]:not([data-value]) {
   display: none;
 }
 #content .map .ON {
@@ -21,6 +24,9 @@ body {
 }
 #content .map .OFF {
   fill-opacity: .2;
+}
+#content .map .ERROR {
+  stroke: #F00;
 }
 .btn {
   background-color: #0045FF;

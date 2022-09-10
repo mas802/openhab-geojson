@@ -42,15 +42,17 @@ const flatArea = function(item,offset,currentarea) {
     features.push(currentarea);
   }
 
-  // FIXME, switch to category? or just iterate all
-  var isLight = item.tags?.includes("Light")
-  if (isLight) {
-    currentarea.properties['Light'] = item.name
-    currentarea.properties['action'] = "Light"
-  }
+  if (currentarea) {
+    // FIXME, switch to category? or just iterate all
+    var isLight = item.tags?.includes("Light")
+    if (isLight) {
+      currentarea.properties['Light'] = item.name
+      currentarea.properties['action'] = "Light"
+    }
 
-  if (item.category) {
-    currentarea.properties[item.category] = item.name
+    if (item.category) {
+      currentarea.properties[item.category] = item.name
+    }
   }
 
   item.members?.forEach(function (i) {
@@ -104,6 +106,8 @@ const flatPoints = function(item,offset,currentpoint) {
       currentpoint.properties['action'] = "Light"
     } else if (item.category == "Blinds") {
       currentpoint.properties['action'] = "Blinds"
+    } else if (item.category == "Heating") {
+      currentpoint.properties['action'] = "Heating"
     }
   }
 
