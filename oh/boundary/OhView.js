@@ -1,7 +1,3 @@
-function updateOHItems(modes) {
-    modes.forEach(e => triggerUpdateState(e));
-}
-
 function handleClick(e, d) {
   let action = d.properties?.action
   let item = d.properties?.item
@@ -27,8 +23,12 @@ function handleClick(e, d) {
   }
 }
 
+function updateOHItems(modes) {
+    modes.forEach(e => triggerUpdateState(e));
+}
+
 function triggerUpdateState(attr) {
-        var ele = document.querySelectorAll('[data-'+attr+']');
+        var ele = document.querySelectorAll('[data-value-type="'+attr+'"]');
         for (var i in ele) if (ele.hasOwnProperty(i)) {
             itemUpdateState(ele[i], attr);
         }
@@ -62,7 +62,7 @@ const itemLightState = async (a, attr) => {
       cls = result
 
       try {
-        value = +result.match(/([\d\.]+)/)[0]
+        value = +result.match(/([-]?[\d\.]+)/)[0]
       } catch(e) {
         value = -99
       }
@@ -93,7 +93,7 @@ const itemTempState = async (a, attr) => {
       a.setAttribute('data-value', result);
 
       try {
-        value = +result.match(/([\d\.]+)/)[0]
+        value = +result.match(/([-]?[\d\.]+)/)[0]
       } catch(e) {
         value = -99
       }
@@ -118,7 +118,7 @@ const itemBatteryState = async (a, attr) => {
       a.setAttribute('data-value', result);
 
       try {
-        value = +result.match(/([\d\.]+)/)[0]
+        value = +result.match(/([-]?[\d\.]+)/)[0]
       } catch(e) {
         value = -99
       }

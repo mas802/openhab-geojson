@@ -13,6 +13,18 @@ body {
   stroke: #000;
   stroke-width: 2px;
 }
+#content .map circle {
+  fill: #fefefe;
+  fill-opacity: .2;
+  stroke: #000;
+  stroke-width: 0px;
+}
+#content .map circle[data-action] {
+  stroke-width: 3.5px;
+}
+#content .map circle[data-type="Point"]:not([data-value]) {
+  display: none;
+}
 #content .map path[data-action] {
   stroke-width: 3.5px;
 }
@@ -26,6 +38,7 @@ body {
   fill-opacity: .2;
 }
 #content .map .ERROR {
+  stroke-width: 1px;
   stroke: #F00;
 }
 .btn {

@@ -38,17 +38,30 @@ let geoGenerator = d3.geoPath()
   .pointRadius(40)
   .projection(projection)
 
-function update(geojson) {
+function drawArea(geojson) {
 
   rect = d3.select(".canvas").node().getBoundingClientRect()
   projection.fitExtent([[40,40],[rect.width-40,rect.height-40]], geojson);
 
   d3.select('#content g.map')
-    .selectAll('path')
-    .data(geojson.features)
-    .enter()
-      .append('path')
+    .selectAll('path').data(geojson.features)
+    .enter().append('path')
       .attr('d', geoGenerator)
+      .on("click", handleClick)
+      .attr('data-type', function(d) {return d.geometry.type})
+      .each(function(d) {
+        for (var name in d.properties) {
+          d3.select(this).attr("data-"+name,d.properties[name])
+        }})
+}
+
+function drawPoints(points) {
+  d3.select('#content g.map')
+    .selectAll('circle').data(points)
+    .enter().append("circle")
+      .attr("cx", function (d) { return d.x; })
+      .attr("cy", function (d) { return d.y; })
+      .attr("r", function(d, i) { return d.r; })
       .on("click", handleClick)
       .attr('data-type', function(d) {return d.geometry.type})
       .each(function(d) {
@@ -112,11 +125,43 @@ d3.json(configurl).then( function(conf) {
 })
 
 d3.json(ohurl).then( function(d) {
-  geoJson = features2Geojson(d, [0,0])
-  update(geoJson)
+  areaGeoJson = area2Geojson(d, [0,0])
+  geoJson = points2Geojson(d, [0,0])
+
+  drawArea(areaGeoJson)
+
+  simPoints(geoJson);
   updateOHItems(modes.split(','))
+
 })
 
+function simPoints(pnts) {
+    nodes = pnts.features.map(function(n) {
+        var pos = projection(n.geometry.coordinates);
+        return {
+            x: pos[0],
+            y: pos[1],
+            r: 40,
+            properties: n.properties,
+            geometry: n.geometry
+        };
+    });
+
+  var simulation = d3.forceSimulation(nodes)
+    .force('charge', d3.forceManyBody().strength(1))
+    .force('collision', d3.forceCollide().radius(function(d) {
+      return d.r*0.9
+    }))
+    .stop().tick(2)
+
+   ended(nodes);
+
+  function ended(nodes) {
+    drawPoints(nodes);
+    updateOHItems(modes.split(','))
+  }
+
+}
   </script>
 </body>
 </html>

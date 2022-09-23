@@ -9,8 +9,25 @@ const features2Geojson = function(rootitem, offset) {
   return geoJson
 }
 
+const area2Geojson = function(rootitem, offset) {
+  let geoJson = {
+    "type": "FeatureCollection",
+    "features": []
+  }
+  geoJson.features = flatArea(rootitem, offset)
+  return geoJson
+}
+
+const points2Geojson = function(rootitem, offset) {
+  let geoJson = {
+    "type": "FeatureCollection",
+    "features": []
+  }
+  geoJson.features = flatPoints(rootitem, offset)
+  return geoJson
+}
+
 const flatArea = function(item,offset,currentarea) {
-//  console.log(item)
 
   var features = [];
   var geo = item.metadata?.geojson?.config?.geometry
@@ -32,7 +49,8 @@ const flatArea = function(item,offset,currentarea) {
       type: "Feature",
       geometry: {type: geo.type, coordinates: coords},
       properties: {
-        item: item.name
+        item: item.name,
+        valueprio: 99
       }}
 
     if (newoffset) {
@@ -50,8 +68,12 @@ const flatArea = function(item,offset,currentarea) {
       currentarea.properties['action'] = "Light"
     }
 
-    if (item.category) {
+    valuePrioOld = currentarea.properties.valueprio
+    valuePrioNew = modes.split(",").indexOf(item.category)
+    if (item.category && valuePrioNew>-1 && valuePrioNew<valuePrioOld) {
       currentarea.properties[item.category] = item.name
+      currentarea.properties['value-type'] = item.category
+      currentarea.properties['valueprio'] = valuePrioNew
     }
   }
 
@@ -86,29 +108,34 @@ const flatPoints = function(item,offset,currentpoint) {
       geometry: {type: pnt.type, coordinates: coords},
       properties: {
         item: item.name,
-        action: item.category
       }
     }
 
-    features.push(currentpoint);
   }
 
   // FIXME this should be more generic
-  if (currentpoint) {
+  if (currentpoint && modes.split(",").includes(item.category)) {
+
+    clonepoint = JSON.parse(JSON.stringify(currentpoint))
+
     if (item.category) {
-      currentpoint.properties[item.category] = item.name
+      clonepoint.properties[item.category] = item.name
+      clonepoint.properties['value-type'] = item.category
     }
 
     if (item.category == "DimmableLight") {
-      currentpoint.properties['action'] = "DimmableLight"
+      clonepoint.properties['action'] = "DimmableLight"
     } else if (item.tags?.includes("Light")) {
-      currentpoint.properties['Light'] = item.name
-      currentpoint.properties['action'] = "Light"
+      clonepoint.properties['Light'] = item.name
+      clonepoint.properties['action'] = "Light"
+      clonepoint.properties['value-type'] = "Light"
     } else if (item.category == "Blinds") {
-      currentpoint.properties['action'] = "Blinds"
+      clonepoint.properties['action'] = "Blinds"
     } else if (item.category == "Heating") {
-      currentpoint.properties['action'] = "Heating"
+      clonepoint.properties['action'] = "Heating"
     }
+
+    features.push(clonepoint);
   }
 
 
