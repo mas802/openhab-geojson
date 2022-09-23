@@ -61,18 +61,19 @@ const flatArea = function(item,offset,currentarea) {
   }
 
   if (currentarea) {
+    var category = item.category
     // FIXME, switch to category? or just iterate all
     var isLight = item.tags?.includes("Light")
     if (isLight) {
-      currentarea.properties['Light'] = item.name
+      category = "Light"
       currentarea.properties['action'] = "Light"
     }
 
     valuePrioOld = currentarea.properties.valueprio
-    valuePrioNew = modes.split(",").indexOf(item.category)
-    if (item.category && valuePrioNew>-1 && valuePrioNew<valuePrioOld) {
-      currentarea.properties[item.category] = item.name
-      currentarea.properties['value-type'] = item.category
+    valuePrioNew = modes.split(",").indexOf(category)
+    if (category && valuePrioNew>-1 && valuePrioNew<valuePrioOld) {
+      currentarea.properties[category] = item.name
+      currentarea.properties['value-type'] = category
       currentarea.properties['valueprio'] = valuePrioNew
     }
   }
@@ -113,25 +114,30 @@ const flatPoints = function(item,offset,currentpoint) {
 
   }
 
+    var category = item.category
+    // FIXME, switch to category? or just iterate all
+    var isLight = item.tags?.includes("Light")
+    if (!category && isLight) {
+      category = "Light"
+    }
+
   // FIXME this should be more generic
-  if (currentpoint && modes.split(",").includes(item.category)) {
+  if (currentpoint && modes.split(",").includes(category)) {
 
     clonepoint = JSON.parse(JSON.stringify(currentpoint))
 
-    if (item.category) {
-      clonepoint.properties[item.category] = item.name
-      clonepoint.properties['value-type'] = item.category
+    if (category) {
+      clonepoint.properties[category] = item.name
+      clonepoint.properties['value-type'] = category
     }
 
-    if (item.category == "DimmableLight") {
+    if (category == "DimmableLight") {
       clonepoint.properties['action'] = "DimmableLight"
-    } else if (item.tags?.includes("Light")) {
-      clonepoint.properties['Light'] = item.name
+    } else if (category == "Light") {
       clonepoint.properties['action'] = "Light"
-      clonepoint.properties['value-type'] = "Light"
-    } else if (item.category == "Blinds") {
+    } else if (category == "Blinds") {
       clonepoint.properties['action'] = "Blinds"
-    } else if (item.category == "Heating") {
+    } else if (category == "Heating") {
       clonepoint.properties['action'] = "Heating"
     }
 
@@ -210,7 +216,7 @@ const ohItemCommand = async (label, val) => {
     } catch (error) {
         console.log(error, 'Oh server is not available');
         return 500;
-    } 
+    }
 
     if (result==='NULL') {
       return 500;
