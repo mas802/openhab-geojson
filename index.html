@@ -41,7 +41,7 @@ let geoGenerator = d3.geoPath()
 function drawArea(geojson) {
 
   rect = d3.select(".canvas").node().getBoundingClientRect()
-  projection.fitExtent([[40,40],[rect.width-40,rect.height-40]], geojson);
+  projection.fitExtent([[60,60],[rect.width-60,rect.height-60]], geojson);
 
   d3.select('#content g.map')
     .selectAll('path').data(geojson.features)
@@ -56,18 +56,25 @@ function drawArea(geojson) {
 }
 
 function drawPoints(points) {
-  d3.select('#content g.map')
+  p = d3.select('#content g.map')
     .selectAll('circle').data(points)
-    .enter().append("circle")
-      .attr("cx", function (d) { return d.x; })
-      .attr("cy", function (d) { return d.y; })
-      .attr("r", function(d, i) { return d.r; })
+    .enter().append("g")
+      .attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
       .on("click", handleClick)
+
+     p.append("circle")
+      .attr("r", function(d, i) { return d.r; })
       .attr('data-type', function(d) {return d.geometry.type})
       .each(function(d) {
         for (var name in d.properties) {
           d3.select(this).attr("data-"+name,d.properties[name])
         }})
+     p.append("text")
+       .attr("text-anchor", "middle")
+       .attr("dy", ".35em")
+       .attr("class", "label")
+       .attr("id", function(d) {return "label-"+d.properties[d.properties['value-type']]})
+       .attr("data-label-item", function(d) {return d.properties[d.properties['value-type']]})
 }
 
 
@@ -118,6 +125,14 @@ d3.json(configurl).then( function(conf) {
              .text(function(d) {return d.substring(0,1)})
   }
 
+    nav.data(["timeline"])
+      .enter()
+          .append("a")
+             .attr("class", "btn")
+             .attr("href", function(d) { return "#"} )
+             .html('&#x1F550;')
+             .on("click", function() {timelapse(this)})
+
   let rot = conf.metadata?.geojson?.config?.rotation
   if (rot) {
     projection.rotate(rot)
@@ -141,18 +156,18 @@ function simPoints(pnts) {
         return {
             x: pos[0],
             y: pos[1],
-            r: 40,
+            r: n.properties.r,
             properties: n.properties,
             geometry: n.geometry
         };
     });
 
   var simulation = d3.forceSimulation(nodes)
-    .force('charge', d3.forceManyBody().strength(1))
+    .force('charge', d3.forceManyBody().strength(0.01))
     .force('collision', d3.forceCollide().radius(function(d) {
-      return d.r*0.9
+      return d.r*0.8
     }))
-    .stop().tick(2)
+    .stop().tick(3)
 
    ended(nodes);
 
@@ -162,6 +177,20 @@ function simPoints(pnts) {
   }
 
 }
+
+let lapseInterval = null;
+let lapseDate = null;
+
+function timelapse(ele) {
+  lapseDate = new Date();
+  clearInterval(lapseInterval);
+  lapseInterval = setInterval(function(){
+    lapseDate = new Date(lapseDate.getTime() - 600000);
+    updateOHItems(modes.split(','), lapseDate);
+    d3.select(ele).attr('title', lapseDate.toISOString());
+  }, 300);
+}
+
   </script>
 </body>
 </html>

@@ -23,40 +23,40 @@ function handleClick(e, d) {
   }
 }
 
-function updateOHItems(modes) {
-    modes.forEach(e => triggerUpdateState(e));
+function updateOHItems(modes, date) {
+    modes.forEach(e => triggerUpdateState(e, date));
 }
 
-function triggerUpdateState(attr) {
+function triggerUpdateState(attr, date) {
         var ele = document.querySelectorAll('[data-value-type="'+attr+'"]');
         for (var i in ele) if (ele.hasOwnProperty(i)) {
-            itemUpdateState(ele[i], attr);
+            itemUpdateState(ele[i], attr, date);
         }
 }
 
-const itemUpdateState = async (ele, attr) => {
+const itemUpdateState = async (ele, attr, date) => {
   switch (attr) {
     case "Heating":
-      itemTempState(ele, 'data-Heating');
+      itemTempState(ele, 'data-Heating', date);
       break;
     case "Temperature":
-      itemTempState(ele, 'data-Temperature');
+      itemTempState(ele, 'data-Temperature', date);
       break;
     case "Battery":
-      itemBatteryState(ele, 'data-Battery');
+      itemBatteryState(ele, 'data-Battery', date);
       break;
     default:
-      itemLightState(ele, 'data-'+attr);
+      itemLightState(ele, 'data-'+attr, date);
   }
 }
 
 
-const itemLightState = async (a, attr) => {
+const itemLightState = async (a, attr, date) => {
     let response, result;
 
     let label = a.getAttribute(attr);
     if (label!=null) {
-      result = await ohItemInfo(label);
+      result = await ohItemInfo(label, date);
 
       a.setAttribute('data-value', result);
       cls = result
@@ -70,10 +70,16 @@ const itemLightState = async (a, attr) => {
       if (value != -99) {
         if (value > 0) { cls = "ON" } else { cls = "OFF"}
         a.setAttribute('style', 'fill: '+colorScaleLight(value))
+        text = document.getElementById("label-"+label);
+        if (text) text.innerHTML = Math.round(value);
       } else if (result === "ON") {
         a.setAttribute('style', 'fill: '+colorScaleLight(100))
+        text = document.getElementById("label-"+label);
+        if (text) text.innerHTML = "ON";
       } else if (result === "OFF") {
         a.setAttribute('style', 'fill: '+colorScaleLight(0))
+        text = document.getElementById("label-"+label);
+        if (text) text.innerHTML = "OFF";
       } else {
         a.setAttribute('style', '')
         cls = "ERROR"
@@ -83,12 +89,12 @@ const itemLightState = async (a, attr) => {
     }
 }
 
-const itemTempState = async (a, attr) => {
+const itemTempState = async (a, attr, date) => {
     let response, result;
 
     let label = a.getAttribute(attr);
     if (label!=null) {
-      result = await ohItemInfo(label);
+      result = await ohItemInfo(label, date);
 
       a.setAttribute('data-value', result);
 
@@ -100,6 +106,8 @@ const itemTempState = async (a, attr) => {
 
       if (value != -99) {
         a.setAttribute('style', 'fill: '+colorScaleTemp(value))
+        text = document.getElementById("label-"+label);
+        if (text) text.innerHTML = Math.round(10*value)/10;
       } else {
         a.setAttribute('style', '')
         a.setAttribute('class', 'ERROR');
@@ -108,12 +116,12 @@ const itemTempState = async (a, attr) => {
     }
 }
 
-const itemBatteryState = async (a, attr) => {
+const itemBatteryState = async (a, attr, date) => {
     let response, result;
 
     let label = a.getAttribute(attr);
     if (label!=null) {
-      result = await ohItemInfo(label);
+      result = await ohItemInfo(label, date);
 
       a.setAttribute('data-value', result);
 
@@ -125,6 +133,8 @@ const itemBatteryState = async (a, attr) => {
 
       if (value != -99) {
         a.setAttribute('style', 'fill: '+colorScaleBattery(value))
+        text = document.getElementById("label-"+label);
+        if (text) text.innerHTML = Math.round(value);
       } else {
         a.setAttribute('style', '')
         a.setAttribute('class', 'ERROR');

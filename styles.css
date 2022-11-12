@@ -19,6 +19,10 @@ body {
   stroke: #000;
   stroke-width: 0px;
 }
+.label {
+  fill: white;
+  font: bold 22px sans-serif;
+}
 #content .map circle[data-action] {
   stroke-width: 3.5px;
 }

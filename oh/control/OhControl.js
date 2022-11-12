@@ -109,6 +109,7 @@ const flatPoints = function(item,offset,currentpoint) {
       geometry: {type: pnt.type, coordinates: coords},
       properties: {
         item: item.name,
+        r: 30,
       }
     }
 
@@ -133,12 +134,16 @@ const flatPoints = function(item,offset,currentpoint) {
 
     if (category == "DimmableLight") {
       clonepoint.properties['action'] = "DimmableLight"
+      clonepoint.properties['r'] = 40
     } else if (category == "Light") {
       clonepoint.properties['action'] = "Light"
+      clonepoint.properties['r'] = 40
     } else if (category == "Blinds") {
       clonepoint.properties['action'] = "Blinds"
+      clonepoint.properties['r'] = 40
     } else if (category == "Heating") {
       clonepoint.properties['action'] = "Heating"
+      clonepoint.properties['r'] = 40
     }
 
     features.push(clonepoint);
@@ -184,8 +189,10 @@ const toggleBlinds = async (label) => {
     }, 200);
 }
 
-const ohItemInfo = async (label) => {
+const ohItemInfo = async (label, date) => {
     let response, result;
+
+    if (date) return ohItemHistoricInfo(label, date);
 
     try {
         response = await fetch('/rest/items/' + label + '/state', {
@@ -201,6 +208,35 @@ const ohItemInfo = async (label) => {
       return {"state": 'ERROR 2', "until": 0};
     }
     return result;
+}
+
+
+const ohItemHistoricInfo = async (label, date) => {
+    let response, result;
+
+    if (!date) {
+      date = new Date();
+    }
+
+    endDateStr = new Date(date.getTime()+60000).toISOString();
+    startDateStr = date.toISOString();
+
+    try {
+        response = await fetch('/rest/persistence/items/' + label + "?page=0&pagelength=1&endtime="+endDateStr+"&starttime="+startDateStr, {
+            method: 'GET'
+        });
+        resultText = await response.text();
+        result = JSON.parse(resultText);
+    } catch (error) {
+        console.log(error, 'Oh server is not available');
+        return {"state": 'ERROR 1', "until": 0};
+    }
+
+    if (result==='NULL') {
+      return {"state": 'ERROR 2', "until": 0};
+    }
+
+    return result.data[0].state;
 }
 
 
