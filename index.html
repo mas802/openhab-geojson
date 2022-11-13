@@ -16,7 +16,7 @@
     </svg>
   </div>
 
-  <script src="http://d3js.org/d3.v6.min.js"></script>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
   <script src="common.v6.js"></script>
   <script src="oh/control/OhControl.js"></script>
   <script src="oh/boundary/OhView.js"></script>
@@ -173,6 +173,7 @@ function simPoints(pnts) {
 
   function ended(nodes) {
     drawPoints(nodes);
+    navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
     updateOHItems(modes.split(','))
   }
 
@@ -190,6 +191,34 @@ function timelapse(ele) {
     d3.select(ele).attr('title', lapseDate.toISOString());
   }, 300);
 }
+
+
+const locationOptions = {
+  enableHighAccuracy: true,
+  timeout: 5000,
+  maximumAge: 0
+};
+
+function locationSuccess(pos) {
+  const crd = pos.coords;
+
+  var posc = projection([pos.coords.longitude,pos.coords.latitude]);
+
+  d3.select('#content g.map')
+    .selectAll('poscircle').data([posc])
+    .enter().append("g")
+      .attr("transform", function(d){return "translate("+d[0]+","+d[1]+")"})
+      .append("circle")
+      .attr("r", function(d, i) { return 10; })
+      .attr("style", "fill: rgb(255, 0, 0)")
+}
+
+function locationError(err) {
+  console.warn(`ERROR(${err.code}): ${err.message}`);
+}
+
+
+
 
   </script>
 </body>
