@@ -138,6 +138,9 @@ const flatPoints = function(item,offset,currentpoint) {
     } else if (category == "Light") {
       clonepoint.properties['action'] = "Light"
       clonepoint.properties['r'] = 40
+    } else if (category == "Switch") {
+      clonepoint.properties['action'] = "Switch"
+      clonepoint.properties['r'] = 40
     } else if (category == "Blinds") {
       clonepoint.properties['action'] = "Blinds"
       clonepoint.properties['r'] = 40

@@ -7,6 +7,9 @@ var colorScale = d3.scaleLinear().domain([ 10, 18, 20, 22, 23, 25])
 var colorScaleTemp = d3.scaleLinear().domain([ 0, 8, 16, 18, 19, 22, 28, 32])
           .range(["darkturqoise", "darkviolet", "blue", "darkgreen", "green", "yellow", "orange", "red"])
 
+var colorScaleState = d3.scaleLinear().domain([ 0, 100])
+          .range(["darkblue", "darkgreen"])
+
 var colorScaleBattery = d3.scaleLinear().domain([ 30, 50, 60,  80, 100])
           .range(["red", "orange", "yellow", "green", "green"])
 

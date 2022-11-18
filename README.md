@@ -13,8 +13,8 @@ It might be developed into a UI addon at some point if there is sufficient inter
 - Openhab 3.0
 - The Models view in openhab should be structured hieracical with a focus on Home / Floors / Rooms (the setup expects the root node to be called Home)
 - The actionable items should have at least either an appropriate Category and/or Tags to make them work ("Light", "DimmableLight", "Temperature", "Blinds", "Heating", etc).
-- There is a limit for one action per area/point, but you can always provide sub-areas/points at the lower level 
-(e.g. each light in a room can have its own area and/or point).
+- There is a limit for one action per area, but you can always provide sub-areas at the lower level 
+(e.g. each light in a room can have its own area and/or points).
 
 ## Place files in /etc/openhab/html/static/geo 
 
@@ -121,14 +121,14 @@ config:
     - -10
 ```
 
-# Currently Supported Item Categories
+# Currently Supported Special Item Category Tyoes ((x) = trigger actions when clicked)
 
-- Light
-- DimmableLight
-- Blinds
-- Temperature
+- Light (Tag:Light(a), DimmableLight(a), Luminance)
+- Temperature (Temperature, SetPoint(a))
 - Battery
-- Heating
+- State (evrything else, e.g. Switch(a), Blinds, Door, Motion, ...)
+
+Hint if you tag a Switch as a Light it will be properly marked as such.
 
 # References and inspirations
 
@@ -140,11 +140,7 @@ config:
 
 ## Stretch Goals / Ideas
 
-- supported types und category/tags should be cleaned up, generalized, and extended
-  - Door: show open and cloesd doors
-  - Luminace: light sensors
-  - Motion: motions sensors 
-- show value as a hover label
+- supported types und category/tags should be futher cleaned up, generalized, and extended
 - mechanism to show outdated information (e.g. Battery Level might be very old)
 - url parameter more generic
 - generic root node instead of Home (multiple root nodes?)
