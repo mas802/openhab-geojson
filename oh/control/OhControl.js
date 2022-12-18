@@ -1,5 +1,8 @@
 /* OH SHARED */
 
+const smallr = 15;
+const bigr = 20;
+
 const features2Geojson = function(rootitem, offset) {
   let geoJson = {
     "type": "FeatureCollection",
@@ -62,7 +65,7 @@ const flatArea = function(item,offset,currentarea) {
 
   if (currentarea) {
     var category = item.category
-    // FIXME, switch to category? or just iterate all
+    // FIXME, this probably should be more generic and not limited to light only
     var isLight = item.tags?.includes("Light")
     if (isLight) {
       category = "Light"
@@ -73,6 +76,7 @@ const flatArea = function(item,offset,currentarea) {
     valuePrioNew = modes.split(",").indexOf(category)
     if (category && valuePrioNew>-1 && valuePrioNew<valuePrioOld) {
       currentarea.properties[category] = item.name
+      currentarea.properties['value-item'] = item.name
       currentarea.properties['value-type'] = category
       currentarea.properties['valueprio'] = valuePrioNew
     }
@@ -109,20 +113,19 @@ const flatPoints = function(item,offset,currentpoint) {
       geometry: {type: pnt.type, coordinates: coords},
       properties: {
         item: item.name,
-        r: 30,
+        r: smallr,
       }
     }
 
   }
 
     var category = item.category
-    // FIXME, switch to category? or just iterate all
+    // FIXME, is there a more elegant way to do this?
     var isLight = item.tags?.includes("Light")
-    if (!category && isLight) {
+    if (isLight) {
       category = "Light"
     }
 
-  // FIXME this should be more generic
   if (currentpoint && modes.split(",").includes(category)) {
 
     clonepoint = JSON.parse(JSON.stringify(currentpoint))
@@ -132,21 +135,22 @@ const flatPoints = function(item,offset,currentpoint) {
       clonepoint.properties['value-type'] = category
     }
 
+    // FIXME this should be more generic
     if (category == "DimmableLight") {
       clonepoint.properties['action'] = "DimmableLight"
-      clonepoint.properties['r'] = 40
+      clonepoint.properties['r'] = bigr
     } else if (category == "Light") {
       clonepoint.properties['action'] = "Light"
-      clonepoint.properties['r'] = 40
+      clonepoint.properties['r'] = bigr
     } else if (category == "Switch") {
       clonepoint.properties['action'] = "Switch"
-      clonepoint.properties['r'] = 40
+      clonepoint.properties['r'] = bigr
     } else if (category == "Blinds") {
       clonepoint.properties['action'] = "Blinds"
-      clonepoint.properties['r'] = 40
+      clonepoint.properties['r'] = bigr
     } else if (category == "Heating") {
       clonepoint.properties['action'] = "Heating"
-      clonepoint.properties['r'] = 40
+      clonepoint.properties['r'] = bigr
     }
 
     features.push(clonepoint);

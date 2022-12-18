@@ -185,5 +185,14 @@ const itemBatteryState = async (a, attr, date) => {
 
 const setLabelText = async (label, value) => {
   text = document.getElementById("label-"+label);
-  if (text) text.innerHTML = value + "<title>" + label  + "</title>";
+  if (text) {
+      text.innerHTML = value;
+  }
+}
+
+const setLabelTitle = async (label, value) => {
+  title = document.getElementById("title-"+label);
+  if (title) {
+    title.innerHTML = label + " " +value;
+  }
 }

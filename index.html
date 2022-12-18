@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>openhab-geojson</title>
   <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
@@ -41,7 +42,7 @@ let geoGenerator = d3.geoPath()
 function drawArea(geojson) {
 
   rect = d3.select(".canvas").node().getBoundingClientRect()
-  projection.fitExtent([[60,60],[rect.width-60,rect.height-60]], geojson);
+  projection.fitExtent([[20,20],[rect.width-20,rect.height-20]], geojson);
 
   d3.select('#content g.map')
     .selectAll('path').data(geojson.features)
@@ -62,13 +63,15 @@ function drawPoints(points) {
       .attr("transform", function(d){return "translate("+d.x+","+d.y+")"})
       .on("click", handleClick)
 
-     p.append("circle")
+     c = p.append("circle")
       .attr("r", function(d, i) { return d.r; })
       .attr('data-type', function(d) {return d.geometry.type})
       .each(function(d) {
         for (var name in d.properties) {
           d3.select(this).attr("data-"+name,d.properties[name])
         }})
+     c.append("title").text(function (d) {return d.properties.item})
+       .attr("id", function(d) {return "title-"+d.properties[d.properties['value-type']]})
      p.append("text")
        .attr("text-anchor", "middle")
        .attr("dy", ".35em")
@@ -147,7 +150,7 @@ d3.json(ohurl).then( function(d) {
 
   simPoints(geoJson);
   updateOHItems(modes.split(','))
-
+  thingStatus()
 })
 
 function simPoints(pnts) {
@@ -177,6 +180,42 @@ function simPoints(pnts) {
     updateOHItems(modes.split(','))
   }
 
+}
+
+let thinginfo = [];
+
+async function thingStatus() {
+  // https://github.com/openhab/org.openhab.ui.habmin/blob/cc910131ebc9cba969c43207ce3144a34d4b09f3/src/web/app/tools/zwave/zwaveNetwork.js
+
+  // FIXME this is probably not secure, so still no sensitive pw
+  // FIXME needs a UI, currently use localStorage.setItem('ohuser', 'username'); in teh console
+  username = localStorage.getItem('ohuser');
+  password = localStorage.getItem('ohpassword');
+
+  response = await fetch('/rest/things/', {
+  method: 'GET',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': 'Basic ' + btoa(username + ":" + password)
+                },
+        });
+  result = await response.text();
+  things = JSON.parse(result);
+   
+  things.forEach(thing => {
+      thing.channels.forEach(channel => {
+        channel.linkedItems.forEach(item => {
+          thinginfo.push({"status": thing.statusInfo.status 
+            + " " + thing.properties.zwave_nodeid 
+            + " " + thing.properties?.zwave_lastheal
+            + " " + thing.properties?.zwave_lastwakeup, "name": item})
+        })
+      })
+   })
+
+   thinginfo.forEach(item => {
+     setLabelTitle(item.name, item.status)
+   })   
 }
 
 let lapseInterval = null;
@@ -218,6 +257,19 @@ function locationError(err) {
 }
 
 
+function locationSuccess(pos) {
+  const crd = pos.coords;
+
+  var posc = projection([pos.coords.longitude,pos.coords.latitude]);
+
+  d3.select('#content g.map')
+    .selectAll('poscircle').data([posc])
+    .enter().append("g")
+      .attr("transform", function(d){return "translate("+d[0]+","+d[1]+")"})
+      .append("circle")
+      .attr("r", function(d, i) { return 10; })
+      .attr("style", "fill: rgb(255, 0, 0)")
+}
 
 
   </script>
