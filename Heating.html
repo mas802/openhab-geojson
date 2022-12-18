@@ -111,10 +111,6 @@ var center = items.selectAll(".center")
   .attr('fill', function(d) { 
      color = colorScaleTemp(0) 
      return color })
-  .on("pointerdown", function(d) { 
-    expanse(d) } )
-  .on("pointerup", function(d) { 
-    console.log(["center",d3.event]) } )
 
 expanseOnMe(item, svgcanvas.selectAll(".mpie").data(itemsmap).enter());
 
@@ -147,7 +143,7 @@ function expanseOnMe(dd,e) {
   .attr("stroke", "white")
   .style("stroke-width", "2px")
   .style("opacity", 1)
-  .on("pointerup", function(d) { 
+  .on("click", function(d) { 
     let val = d.data.key
     if (val===0) {
       val = "OFF"

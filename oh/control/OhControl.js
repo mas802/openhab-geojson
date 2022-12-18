@@ -33,11 +33,11 @@ const points2Geojson = function(rootitem, offset) {
 const flatArea = function(item,offset,currentarea) {
 
   var features = [];
-  var geo = item.metadata?.geojson?.config?.geometry
-  if (geo) {
+  if (item.metadata && item.metadata.geojson && item.metadata.geojson && item.metadata.geojson.config && item.metadata.geojson.config.geometry) {
+    var geo = item.metadata.geojson.config.geometry
 
     let coords = geo.coordinates
-    let newoffset = item.metadata?.geojson?.config?.offset
+    let newoffset = item.metadata.geojson.config.offset
     if (offset) {
       if (newoffset) {
         offset = newoffset;
@@ -66,7 +66,7 @@ const flatArea = function(item,offset,currentarea) {
   if (currentarea) {
     var category = item.category
     // FIXME, this probably should be more generic and not limited to light only
-    var isLight = item.tags?.includes("Light")
+    var isLight = item.tags.includes("Light")
     if (isLight) {
       category = "Light"
       currentarea.properties['action'] = "Light"
@@ -82,7 +82,7 @@ const flatArea = function(item,offset,currentarea) {
     }
   }
 
-  item.members?.forEach(function (i) {
+  if (item.members) item.members.forEach(function (i) {
     features = features.concat(flatArea(i,offset,currentarea));
   });
 
@@ -92,11 +92,14 @@ const flatArea = function(item,offset,currentarea) {
 const flatPoints = function(item,offset,currentpoint) {
   var features = [];
 
-  var pnt = item.metadata?.geojson?.config?.point
+  var pnt;
+  if (item.metadata && item.metadata.geojson && item.metadata.geojson && item.metadata.geojson.config && item.metadata.geojson.config.point) {
+    pnt = item.metadata.geojson.config.point
+  }
 
-  let newoffset = item.metadata?.geojson?.config?.offset
   if (offset) {
-    if (newoffset) {
+    if (item.metadata && item.metadata.geojson && item.metadata.geojson && item.metadata.geojson.config && item.metadata.geojson.config.offset) {
+      let newoffset = item.metadata.geojson.config.offset
       offset = newoffset;
     }
   }
@@ -119,12 +122,12 @@ const flatPoints = function(item,offset,currentpoint) {
 
   }
 
-    var category = item.category
-    // FIXME, is there a more elegant way to do this?
-    var isLight = item.tags?.includes("Light")
-    if (isLight) {
-      category = "Light"
-    }
+  var category = item.category
+  // FIXME, is there a more elegant way to do this?
+  var isLight = item.tags.includes("Light")
+  if (isLight && category != "DimmableLight") {
+    category = "Light"
+  }
 
   if (currentpoint && modes.split(",").includes(category)) {
 
@@ -157,7 +160,7 @@ const flatPoints = function(item,offset,currentpoint) {
   }
 
 
-  item.members?.forEach(function (i) {
+  if (item.members) item.members.forEach(function (i) {
     features = features.concat(flatPoints(i,offset,currentpoint));
   });
 

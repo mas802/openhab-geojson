@@ -8,21 +8,23 @@
 </head>
 <body>
 
-  <div id="nav">
-  </div>
-
   <div id="content">
     <svg class="canvas">
       <g class="map"></g>
     </svg>
   </div>
 
-  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <div id="nav">
+  </div>
+
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
   <script src="common.v6.js"></script>
   <script src="oh/control/OhControl.js"></script>
   <script src="oh/boundary/OhView.js"></script>
 
   <script>
+
 
 /**
 
@@ -33,11 +35,14 @@
 **/
 
 // TODO Mercator could be problematic further up north
-let projection = d3.geoMercator()
+let projection = d3.geoMercator();
+
 
 let geoGenerator = d3.geoPath()
   .pointRadius(40)
   .projection(projection)
+
+
 
 function drawArea(geojson) {
 
@@ -87,6 +92,7 @@ function drawPoints(points) {
 
 **/
 
+
 var queryString = location.search;
 let params = new URLSearchParams(queryString);
 
@@ -104,11 +110,11 @@ ohurl = "/rest/items/"+group+"?metadata=geojson&recursive=true"
 
 var enableExport = params.get("export");
 
-d3.json(configurl).then( function(conf) {
+d3.json(configurl, function(conf) {
   nav = d3.select('#nav')
       .selectAll("a")
 
-  let navgroups = conf.metadata?.geojson?.config?.nav
+  let navgroups = conf.metadata.geojson.config.nav
   if (navgroups) {
     nav.data(navgroups)
       .enter()
@@ -118,7 +124,7 @@ d3.json(configurl).then( function(conf) {
              .text(function(d) {return d})
   }
 
-  let modgroups = conf.metadata?.geojson?.config?.modes
+  let modgroups = conf.metadata.geojson.config.modes
   if (modgroups) {
     nav.data(modgroups)
       .enter()
@@ -136,13 +142,15 @@ d3.json(configurl).then( function(conf) {
              .html('&#x1F550;')
              .on("click", function() {timelapse(this)})
 
-  let rot = conf.metadata?.geojson?.config?.rotation
+  let rot = conf.metadata.geojson.config.rotation
   if (rot) {
     projection.rotate(rot)
   }
 })
 
-d3.json(ohurl).then( function(d) {
+
+
+d3.json(ohurl, function(d) {
   areaGeoJson = area2Geojson(d, [0,0])
   geoJson = points2Geojson(d, [0,0])
 
@@ -207,8 +215,8 @@ async function thingStatus() {
         channel.linkedItems.forEach(item => {
           thinginfo.push({"status": thing.statusInfo.status 
             + " " + thing.properties.zwave_nodeid 
-            + " " + thing.properties?.zwave_lastheal
-            + " " + thing.properties?.zwave_lastwakeup, "name": item})
+            + " " + thing.properties.zwave_lastheal
+            + " " + thing.properties.zwave_lastwakeup, "name": item})
         })
       })
    })
@@ -270,6 +278,7 @@ function locationSuccess(pos) {
       .attr("r", function(d, i) { return 10; })
       .attr("style", "fill: rgb(255, 0, 0)")
 }
+
 
 
   </script>

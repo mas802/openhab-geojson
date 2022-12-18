@@ -4,7 +4,7 @@ body {
   color: #333;
 }
 #content .canvas {
-  height: 70vh;
+  height: 75vh;
   width: 100%;
 }
 #content .map path {
@@ -27,13 +27,13 @@ circle[data-action] .label {
   font: bold 22px sans-serif;
 }
 #content .map circle[data-action] {
-  stroke-width: 3.5px;
+  stroke-width: 2px;
 }
 #content .map circle[data-type="Point"]:not([data-value]) {
   display: none;
 }
 #content .map path[data-action] {
-  stroke-width: 3.5px;
+  stroke-width: 2px;
 }
 #content .map path[data-type="Point"]:not([data-value]) {
   display: none;
@@ -45,7 +45,7 @@ circle[data-action] .label {
   fill-opacity: .2;
 }
 #content .map .ERROR {
-  stroke-width: 1px;
+  stroke-width: 0.5px;
   stroke: #F00;
 }
 .btn {
@@ -65,4 +65,8 @@ circle[data-action] .label {
 }
 #content .map [data-type="Point"] {
   fill-opacity: 0.5;
+}
+#nav {
+  display: block;
+  text-align: center;
 }

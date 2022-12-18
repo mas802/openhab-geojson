@@ -1,31 +1,31 @@
-function handleClick(e, d) {
-  let action = d.properties?.action
-  let item = d.properties?.item
+function handleClick(d) {
+  let action = d.properties.action
+  let item = d.properties.item
 
   // log the lat long coordinates of the coursor for info TODO correct for circles
-  coords = projection.invert(d3.pointer(e));
-  console.info(["clicked on: ", coords]);
+  // coords = projection.invert(d3.pointer(e));
+  // console.info(["clicked on: ", coords]);
 
   switch (action) {
     case "Light":
-      toggleLight(d.properties?.Light)
+      toggleLight(d.properties.Light)
       break
     case "Switch":
-      toggleLight(d.properties?.Switch)
+      toggleLight(d.properties.Switch)
       break
     case "DimmableLight":
       // TODO poping up the dimmer on the main vie might also be nice
-      window.location.href = 'dimmer.html?item=' + d.properties?.DimmableLight;
+      window.location.href = 'dimmer.html?item=' + d.properties.DimmableLight;
       break
     case "Heating":
       // TODO poping up the dimmer on the main vie might also be nice
-      window.location.href = 'Heating.html?item=' + d.properties?.Heating;
+      window.location.href = 'Heating.html?item=' + d.properties.Heating;
       break
     case "Blinds":
-      toggleBlinds(d.properties?.Blinds)
+      toggleBlinds(d.properties.Blinds)
       break
     case "Group":
-      window.location.href = 'index.html?group=' + d.properties?.Group;
+      window.location.href = 'index.html?group=' + d.properties.Group;
       break
   }
 }
