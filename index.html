@@ -142,12 +142,12 @@ d3.json(configurl, function(conf) {
              .html('&#x1F550;')
              .on("click", function() {timelapse(this)})
 
-  let rot = conf.metadata.geojson.config.rotation
-  if (rot) {
+  if (conf.metadata && conf.metadata.geojson && conf.metadata.geojson.config && conf.metadata.geojson.config.rotation) {
+    let rot = conf.metadata.geojson.config.rotation
+    console.log(rot)
     projection.rotate(rot)
   }
 })
-
 
 
 d3.json(ohurl, function(d) {
@@ -160,6 +160,10 @@ d3.json(ohurl, function(d) {
   updateOHItems(modes.split(','))
   thingStatus()
 })
+
+window.addEventListener('focus', function(){
+  updateOHItems(modes.split(','))
+});
 
 function simPoints(pnts) {
     nodes = pnts.features.map(function(n) {
@@ -176,7 +180,7 @@ function simPoints(pnts) {
   var simulation = d3.forceSimulation(nodes)
     .force('charge', d3.forceManyBody().strength(0.01))
     .force('collision', d3.forceCollide().radius(function(d) {
-      return d.r*0.8
+      return d.r*1.4
     }))
     .stop().tick(3)
 
