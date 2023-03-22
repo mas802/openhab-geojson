@@ -27,6 +27,8 @@ function handleClick(d) {
     case "Group":
       window.location.href = 'index.html?group=' + d.properties.Group;
       break
+    default:
+      window.location.href = '/analyzer/?items=' + d.properties[d.properties['value-type']];
   }
 }
 
