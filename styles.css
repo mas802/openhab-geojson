@@ -38,6 +38,12 @@ circle[data-action] .label {
 #content .map path[data-type="Point"]:not([data-value]) {
   display: none;
 }
+body.ON {
+  background-color: #ffffff;
+}
+body.OFF {
+  background-color: #aeaeae;
+}
 #content .map .ON {
   fill-opacity: .2;
 }

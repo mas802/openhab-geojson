@@ -6,7 +6,7 @@
   <link rel="stylesheet" href="styles.css">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
-<body>
+<body data-value-type="Light" data-Light="gLights">
 
   <div id="content">
     <svg class="canvas">
@@ -70,6 +70,7 @@ function drawPoints(points) {
 
      c = p.append("circle")
       .attr("r", function(d, i) { return d.r; })
+      .attr("id", function(d) {return "circle-"+d.properties[d.properties['value-type']]})
       .attr('data-type', function(d) {return d.geometry.type})
       .each(function(d) {
         for (var name in d.properties) {
@@ -165,12 +166,22 @@ window.addEventListener('focus', function(){
   updateOHItems(modes.split(','))
 });
 
+setInterval(function(){
+    updateOHItems(modes.split(','));
+}, 1000*60*5);
+
 function simPoints(pnts) {
+    rndx = 0.0
+    rndy = 0.0
     nodes = pnts.features.map(function(n) {
         var pos = projection(n.geometry.coordinates);
+        rndx = (rndx + 27*13) % 37
+        rndy = (rndy + 11*41) % 59
+        dx = (rndx-18.5)/37
+        dy = (rndy-29.5)/59
         return {
-            x: pos[0],
-            y: pos[1],
+            x: pos[0]+dx,
+            y: pos[1]+dy,
             r: n.properties.r,
             properties: n.properties,
             geometry: n.geometry
@@ -200,7 +211,7 @@ async function thingStatus() {
   // https://github.com/openhab/org.openhab.ui.habmin/blob/cc910131ebc9cba969c43207ce3144a34d4b09f3/src/web/app/tools/zwave/zwaveNetwork.js
 
   // FIXME this is probably not secure, so still no sensitive pw
-  // FIXME needs a UI, currently use localStorage.setItem('ohuser', 'username'); in teh console
+  // FIXME needs a UI, currently use localStorage.setItem('ohuser', 'username'); in the console
   username = localStorage.getItem('ohuser');
   password = localStorage.getItem('ohpassword');
 
@@ -217,6 +228,18 @@ async function thingStatus() {
   things.forEach(thing => {
       thing.channels.forEach(channel => {
         channel.linkedItems.forEach(item => {
+          
+          lh = new Date() - new Date(thing.properties.zwave_lastheal)
+          lw = new Date() - new Date(thing.properties.zwave_lastwakeup)
+          
+          m = (lh && lw)?Math.min(lh,lw): (lh)?lh:lw;
+
+          delta = m / (1000*60*60*24)
+
+          if (delta > 1) {
+             document.getElementById("circle-"+item)?.setAttribute("class", "ERROR")
+          }
+          
           thinginfo.push({"status": thing.statusInfo.status 
             + " " + thing.properties.zwave_nodeid 
             + " " + thing.properties.zwave_lastheal
@@ -242,7 +265,6 @@ function timelapse(ele) {
     d3.select(ele).attr('title', lapseDate.toISOString());
   }, 300);
 }
-
 
 const locationOptions = {
   enableHighAccuracy: true,
