@@ -189,17 +189,17 @@ function simPoints(pnts) {
     });
 
   var simulation = d3.forceSimulation(nodes)
-    .force('charge', d3.forceManyBody().strength(0.01))
+    .force('charge', d3.forceManyBody().strength(0.05))
     .force('collision', d3.forceCollide().radius(function(d) {
-      return d.r*1.4
+      return d.r*1.7
     }))
-    .stop().tick(3)
+    .stop().tick(5)
 
    ended(nodes);
 
   function ended(nodes) {
     drawPoints(nodes);
-    navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
+//    navigator.geolocation.getCurrentPosition(locationSuccess, locationError, locationOptions);
     updateOHItems(modes.split(','))
   }
 

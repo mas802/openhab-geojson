@@ -66,6 +66,10 @@ body.OFF {
   margin: 4px 2px;
   cursor: pointer;
 }
+.buttonholder {
+  display: block;
+  text-align: center;
+}
 .modes {
   background-color: #FF4500;
 }

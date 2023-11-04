@@ -140,20 +140,30 @@ const flatPoints = function(item,offset,currentpoint) {
 
     // FIXME this should be more generic
     if (category == "DimmableLight") {
-      clonepoint.properties['action'] = "DimmableLight"
+      clonepoint.properties['action'] = "Dimmer"
       clonepoint.properties['r'] = bigr
     } else if (category == "Light") {
-      clonepoint.properties['action'] = "Light"
+      clonepoint.properties['action'] = "Toggle"
       clonepoint.properties['r'] = bigr
     } else if (category == "Switch") {
-      clonepoint.properties['action'] = "Switch"
+      clonepoint.properties['action'] = "Toggle"
       clonepoint.properties['r'] = bigr
     } else if (category == "Blinds") {
-      clonepoint.properties['action'] = "Blinds"
+      clonepoint.properties['action'] = "BlindsToggle"
       clonepoint.properties['r'] = bigr
     } else if (category == "Heating") {
-      clonepoint.properties['action'] = "Heating"
+      clonepoint.properties['action'] = "HeatingDimmer"
       clonepoint.properties['r'] = bigr
+    } else if (category == "Select") { // TODO maybe namespace this gjSelect
+      clonepoint.properties['action'] = "Select"
+      clonepoint.properties['r'] = bigr
+    } else if (category == "SoundVolume") {
+      clonepoint.properties['action'] = "Dimmer"
+      clonepoint.properties['r'] = bigr
+    }
+
+    if (item.metadata && item.metadata.geojson && item.metadata.geojson && item.metadata.geojson.config && item.metadata.geojson.config.icon) {
+      clonepoint.properties['icon'] = item.metadata.geojson.config.icon
     }
 
     features.push(clonepoint);

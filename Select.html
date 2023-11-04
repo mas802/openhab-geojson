@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>openhab-geojson Select</title>
+  <link rel="stylesheet" href="styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+
+  <div id="nav" class=""buttonholder">
+  </div>
+
+  <div class="buttonholder">
+    <a class="btn" onclick="window.location=document.referrer">Back</a>
+    <a class="btn" href="sonos://">Sonos</a>
+  </div>
+
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <script src="common.v6.js"></script>
+  <script src="oh/control/OhControl.js"></script>
+  <script src="oh/boundary/OhView.js"></script>
+
+  <script>
+
+/**
+
+  ENTRY POINT
+
+**/
+
+var queryString = location.search;
+let params = new URLSearchParams(queryString);
+
+let rootgroup = "Home"
+
+let item = params.get("item");
+
+configurl = "/rest/items/"+rootgroup+"?metadata=geojson&recursive=false"
+ohurl = "/rest/items/"+item+"?metadata=geojson&recursive=false"
+
+d3.json(ohurl, function(itemobj) {
+  set = itemobj.metadata.geojson.config.set
+ 
+  d3.json(configurl, function(conf) {
+    select = d3.select('#nav')
+      .selectAll("a")
+
+    let navgroups = d3.entries(conf.metadata.geojson.config[set])
+    if (navgroups) {
+      select.data(navgroups)
+        .enter()
+          .append("a")
+             .attr("class", "btn")
+             .text(function(d) {
+                return d.key
+             })
+             .on("click", function(d) {
+               let val = d.value
+               ohItemCommand(item, val)
+               // TODO would be nice to indicate active item and update that here
+               if ('referrer' in document) {
+                 window.location = document.referrer;
+               }
+              })
+    }
+  })
+})
+
+  </script>
+</body>
+</html>

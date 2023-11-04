@@ -103,6 +103,7 @@ To set this select the root node and click "Add Metadata" then enter geojson as 
 - nav: an array of groups for the main navigation 
 - modes: an array of modes for the main navigation 
 - rotation: a rotation matrix
+- set additional sets to be used by the Select category (experimental)
 
 Example: This will create a navigation with 3 nodes, 2 modes and rotate the floorplan by 10 degrees.
 ```
@@ -127,6 +128,7 @@ config:
 - Temperature (Temperature, SetPoint(a))
 - Battery
 - State (evrything else, e.g. Switch(a), Blinds, Door, Motion, ...)
+- Select (Special category with predefined states from the Home config)
 
 Hint if you tag a Switch as a Light it will be properly marked as such.
 
@@ -140,12 +142,11 @@ Hint if you tag a Switch as a Light it will be properly marked as such.
 
 ## Stretch Goals / Ideas
 
-- supported types und category/tags should be futher cleaned up, generalized, and extended
-- mechanism to show outdated information (e.g. Battery Level might be very old)
+- supported types und category/tags should be further cleaned up, generalized, and extended
 - url parameter more generic
 - generic root node instead of Home (multiple root nodes?)
 - make sure boundary/control pattern is followed cleanly
 - make an app.js with modules/webcomponents?
-- move to a more modern d3.js than v6
+- move to a more modern d3.js than v4 (support for old iPad)
 - .reverse is tied to offset for importer
 - convert to plugin

@@ -1,34 +1,36 @@
 function handleClick(d) {
   let action = d.properties.action
-  let item = d.properties.item
+  let item = d.properties[d.properties['value-type']]
 
   // log the lat long coordinates of the coursor for info TODO correct for circles
   // coords = projection.invert(d3.pointer(e));
   // console.info(["clicked on: ", coords]);
 
   switch (action) {
+    case "Toggle":
     case "Light":
-      toggleLight(d.properties.Light)
+      toggleLight(item)
       break
-    case "Switch":
-      toggleLight(d.properties.Switch)
-      break
-    case "DimmableLight":
+    case "Dimmer":
       // TODO poping up the dimmer on the main vie might also be nice
-      window.location.href = 'dimmer.html?item=' + d.properties.DimmableLight;
+      window.location.href = 'dimmer.html?item=' + item;
       break
-    case "Heating":
+    case "HeatingDimmer":
       // TODO poping up the dimmer on the main vie might also be nice
-      window.location.href = 'Heating.html?item=' + d.properties.Heating;
+      window.location.href = 'Heating.html?item=' + item;
       break
-    case "Blinds":
-      toggleBlinds(d.properties.Blinds)
+    case "Select": // rename / use player?
+      // TODO poping up the dimmer on the main vie might also be nice
+      window.location.href = 'Select.html?item=' + item;
+      break
+    case "BlindsToggle":
+      toggleBlinds(item)
       break
     case "Group":
-      window.location.href = 'index.html?group=' + d.properties.Group;
+      window.location.href = 'index.html?group=' + item;
       break
     default:
-      window.location.href = '/analyzer/?items=' + d.properties[d.properties['value-type']];
+      window.location.href = '/analyzer/?items=' + item;
   }
 }
 
@@ -57,11 +59,32 @@ const itemUpdateState = async (ele, attr, date) => {
     case "Light":
       itemLightState(ele, 'data-'+attr, date);
       break;
+    case "Select":
+      itemStateSelect(ele, 'data-'+attr, date, "♫");
+      break;
     default:
       itemState(ele, 'data-'+attr, date);
   }
 }
 
+
+const itemStateSelect = async (a, attr, date, char) => {
+
+    let label = a.getAttribute(attr);
+    if (label!=null) {
+      result = await ohItemInfo(label, date);
+
+      a.setAttribute('data-value', result);
+
+      let icon = a.getAttribute('data-icon');
+      setLabelText(label, icon);
+      if (result === "OFF" || (result && result.state)) {
+        a.setAttribute('style', 'fill: '+colorScaleState(0))
+      } else {
+        a.setAttribute('style', 'fill: '+colorScaleState(100))
+      }
+    }
+}
 
 const itemState = async (a, attr, date) => {
     let response, result;
